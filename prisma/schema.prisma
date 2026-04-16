@@ -1,0 +1,120 @@
+// https://authjs.dev/getting-started/adapters/prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  
+  accounts        Account[]
+  sessions        Session[]
+  
+  // Relations métier
+  trackedAccounts AccountTracked[]
+  leads           Lead[] // L'utilisateur possède ses leads directement
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- BUSINESS LOGIC (Scraping & Leads) ---
+
+model AccountTracked {
+  id          String   @id @default(cuid())
+  linkedinUrl String   @unique
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  posts PostTracked[]
+
+  @@unique([userId, linkedinUrl])
+}
+
+model PostTracked {
+  id               String   @id @default(cuid())
+  accountTrackedId String
+  postUrl          String?  @unique // Identifiant unique pour éviter les doublons lors du scrape
+  data             Json     // Données brutes du post
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  accountTracked AccountTracked @relation(fields: [accountTrackedId], references: [id], onDelete: Cascade)
+  
+  // Si le Post est supprimé, le Lead n'est PAS supprimé (SetNull)
+  leads Lead[]
+}
+
+model Lead {
+  id            String  @id @default(cuid())
+  userId        String  
+  postTrackedId String? 
+
+  type          String  
+  // 1. ON ENLÈVE le @unique ici
+  urlProfile    String  
+  name          String
+  subtitle      String? 
+  content       String? @db.Text
+  favorite      Boolean @default(false)
+  
+  linkedinDate  String?
+  timestamp     BigInt?
+  postLink      String? 
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post PostTracked? @relation(fields: [postTrackedId], references: [id], onDelete: SetNull)
+
+  // 2. ON AJOUTE cette contrainte à la place :
+  // Elle garantit que le couple (userId + urlProfile) est unique.
+  @@unique([userId, urlProfile])
+
+  @@index([urlProfile])
+  @@index([userId])
+}
