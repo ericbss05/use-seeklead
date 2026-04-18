@@ -2,11 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 
-interface RawPost {
-  url?: string;
-  postUrl?: string;
-  content?: string;
-  [key: string]: string | number | boolean | object | null | undefined | unknown; // Permet de stocker d'autres champs variables dans le Json Prisma
+
+interface LinkedInPostRaw {
+  linkedinUrl?: string; // L'URL que l'on cherche dans ton JSON
+  [key: string]: unknown;
 }
 
 interface RawLead {
@@ -34,16 +33,37 @@ interface RawLead {
  * Enregistre les posts scrapés.
  * On utilise skipDuplicates pour ne pas supprimer les posts existants (et donc garder les leads liés).
  */
-export async function saveScrapedPosts(accountId: string, posts: RawPost[]) {
-  return await prisma.postTracked.createMany({
-    data: posts.map((post) => ({
-      accountTrackedId: accountId,
-      // On suppose que l'URL du post est dans post.url ou post.postUrl
-      postUrl: post.url || post.postUrl || null, 
-      data: post as object,
-    })),
+export async function saveScrapedPosts(accountId: string, posts: LinkedInPostRaw[]) {
+  // 1. Transformation : On extrait "linkedinUrl" pour le mettre dans "postUrl"
+  const dataToInsert = posts
+    .filter((post) => post.linkedinUrl) // On ignore ce qui n'a pas d'URL
+    .map((post) => {
+      // Nettoyage de l'URL (on enlève les paramètres après le ?)
+      // C'est CRUCIAL car LinkedIn change les paramètres à chaque clic
+      const cleanUrl = post.linkedinUrl!.split('?')[0];
+
+      return {
+        accountTrackedId: accountId,
+        postUrl: cleanUrl, // On stocke l'URL ici pour la comparaison DB
+        data: post as object, // On garde tout le JSON intact à côté
+      };
+    });
+
+  if (dataToInsert.length === 0) {
+    return { success: true, count: 0 };
+  }
+
+  // 2. Insertion avec skipDuplicates
+  // Ça ne marchera QUE SI ton schéma a : @@unique([accountTrackedId, postUrl])
+  const result = await prisma.postTracked.createMany({
+    data: dataToInsert,
     skipDuplicates: true, 
   });
+
+  return {
+    success: true,
+    count: result.count
+  };
 }
 
 /**

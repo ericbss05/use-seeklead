@@ -96,25 +96,27 @@ export function AccountUrlForm({
   )}
 
   <Dialog open={open} onOpenChange={(v) => (!forceOpen || v) && setOpen(v)}>
-    <DialogContent className="sm:max-w-106.25 p-0 overflow-hidden border-none shadow-2xl">
+    <DialogContent className="sm:max-w-200 p-0 overflow-hidden border-none shadow-2xl">
       {/* Header avec gradient discret */}
       <div className="bg-linear-to-b from-zinc-50 to-white p-6 pb-4">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-semibold tracking-tight">
-              Surveillance
-            </DialogTitle>
-            <Badge 
-              variant={isLimitReached ? "destructive" : "secondary"}
-              className="font-mono transition-all"
-            >
-              {accounts.length} / {MAX_ACCOUNTS}
-            </Badge>
-          </div>
-          <DialogDescription className="text-zinc-500 pt-1">
-            Suivez de nouveaux profils pour automatiser l&apos;extraction.
-          </DialogDescription>
-        </DialogHeader>
+  <div className="flex items-center justify-center gap-2">
+    <DialogTitle className="text-xl font-semibold tracking-tight">
+      Ajouter une source de leads
+    </DialogTitle>
+
+    <Badge 
+      variant={isLimitReached ? "destructive" : "secondary"}
+      className="font-mono transition-all"
+    >
+      {accounts.length} / {MAX_ACCOUNTS}
+    </Badge>
+  </div>
+
+  <DialogDescription className="flex justify-center text-zinc-500 pt-1">
+    Analysez un compte LinkedIn pour identifier les personnes ayant interagis avec ses publications.
+  </DialogDescription>
+</DialogHeader>
 
         {/* Zone de saisie stylisée */}
         <div className="mt-6 space-y-3">
