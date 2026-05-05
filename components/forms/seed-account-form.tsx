@@ -9,7 +9,6 @@ import {
 
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Zap } from "lucide-react";
 
 type SeedAccount = {
   id: string;
@@ -193,10 +192,6 @@ const addItem = () => {
 
       {/* HEADER */}
       <div className="space-y-3">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-neutral-100 mb-2">
-          <Zap className="w-6 h-6 text-neutral-900" />
-        </div>
-
         <h2 className="text-3xl font-bold tracking-tight text-neutral-900">
           Bassins d&apos;interaction
         </h2>

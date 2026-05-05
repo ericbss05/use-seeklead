@@ -1,13 +1,15 @@
 import { auth } from "@/auth";
-import { getSeedAccounts } from "@/lib/db/seed-account";
-import AddClient from "./_components/add-flow";
+import { redirect } from "next/navigation";
+import AddFlow from "./_components/add-flow";
 
 export default async function AddPage() {
   const session = await auth();
 
-  const seedAccounts = await getSeedAccounts(session?.user?.id ?? "");
+  if (!session) {
+    redirect("/login");
+  }
 
   return (
-    <AddClient initialSeedAccounts={seedAccounts} />
+    <AddFlow />
   );
 }
