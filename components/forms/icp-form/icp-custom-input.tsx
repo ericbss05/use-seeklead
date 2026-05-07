@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { IcpAiDialog } from "@/components/icp-ai-dialog";
+import { IcpAiDialog } from "@/components/forms/icp-form/icp-ai-dialog";
 import { Plus } from "lucide-react";
 
 type IcpCustomInputProps = {

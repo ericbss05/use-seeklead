@@ -91,11 +91,42 @@ model SeedAccount {
   linkedinUrl String
   name        String?
 
+    posts     Post[]
+
   createdAt   DateTime @default(now())
 
   @@index([userId])
 
   @@unique([userId, linkedinUrl]) 
+}
+
+model Post {
+  id            String   @id @default(cuid())
+
+  seedAccountId String
+  seedAccount   SeedAccount @relation(fields: [seedAccountId], references: [id], onDelete: Cascade)
+
+  externalId    String   // id du post LinkedIn (ex: "7457315241668866048")
+
+  content       String?
+  linkedinUrl   String
+
+  authorName    String?
+  authorAvatar  String?
+
+  imageUrl      String?
+  videoUrl      String?
+
+  likes         Int?
+  comments      Int?
+  shares        Int?
+
+  postedAt      DateTime?
+
+  createdAt     DateTime @default(now())
+
+  @@unique([seedAccountId, externalId]) 
+  @@index([seedAccountId])
 }
 
 model Icp {

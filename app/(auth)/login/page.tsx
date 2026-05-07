@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { auth } from "@/auth";
 
 import { Field, FieldGroup } from "@/components/ui/field";
-import { GoogleSignInButton } from "@/components/google-sign-in-button";
+import { GoogleSignInButton } from "@/app/(auth)/login/_components/google-sign-in-button";
 import Image from "next/image";
 
 export const metadata: Metadata = {
