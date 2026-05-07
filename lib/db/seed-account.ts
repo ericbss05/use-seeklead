@@ -24,3 +24,22 @@ export async function hasSeedAccount(userId: string): Promise<boolean> {
 
   return count > 0;
 }
+
+export async function getAllSeedAccounts() {
+  return prisma.seedAccount.findMany({
+    where: {
+      linkedinUrl: { not: "" },
+    },
+  });
+}
+
+/**
+ * DB - user accounts
+ */
+export async function getUserSeedAccounts(userId: string) {
+  return prisma.seedAccount.findMany({
+    where: {
+      userId,
+    },
+  });
+}

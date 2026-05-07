@@ -68,7 +68,7 @@ export async function savePosts(
 /**
  * Get posts for UI (feed)
  */
-export async function getPostsByUser(userId: string) {
+export async function getAllPostsByUser(userId: string) {
   return prisma.post.findMany({
     where: {
       seedAccount: {
@@ -77,6 +77,41 @@ export async function getPostsByUser(userId: string) {
     },
     orderBy: {
       postedAt: "desc",
+    },
+  });
+}
+
+export async function getLastPostsByUser(userId: string) {
+  return prisma.post.findMany({
+    where: {
+      seedAccount: {
+        userId,
+      },
+    },
+    orderBy: {
+      postedAt: "desc",
+    },
+    take:5,
+    select: {
+       id: true,
+       linkedinUrl: true,
+    },
+  });
+}
+
+export async function getLastPostsPerUser() {
+    return prisma.seedAccount.findMany({
+    include: {
+      posts: {
+        orderBy: {
+          postedAt: "desc",
+        },
+        take: 5,
+        select: {
+          id: true,
+          linkedinUrl: true,
+    },
+      },
     },
   });
 }

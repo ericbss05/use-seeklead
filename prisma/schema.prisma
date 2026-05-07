@@ -120,7 +120,7 @@ model Post {
   likes         Int?
   comments      Int?
   shares        Int?
-
+  leads         Lead[]
   postedAt      DateTime?
 
   createdAt     DateTime @default(now())
@@ -138,4 +138,26 @@ model Icp {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Lead {
+  id            String  @id @default(cuid())
+  postId        String? 
+
+  type          String  
+  urlProfile    String  
+  name          String
+  subtitle      String? 
+  content       String? @db.Text
+  score         Int?
+  aiFeedback    String?
+  favorite      Boolean @default(false)
+  
+  timestamp     BigInt?
+  postLink      String? 
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  post Post? @relation(fields: [postId], references: [id], onDelete: SetNull)
 }

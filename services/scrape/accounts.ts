@@ -1,33 +1,21 @@
-import { prisma } from "@/lib/prisma";
+import {
+  getAllSeedAccounts,
+  getUserSeedAccounts
+} from "@/lib/db/seed-account"
 import { savePosts } from "@/app/actions/posts.actions";
 
 const ACTOR_ID = "A3cAPGpwBEG8RJwse";
 
-/**
- * DB - all accounts
- */
-export async function getAllSeedAccounts() {
-  return prisma.seedAccount.findMany({
-    where: {
-      linkedinUrl: { not: "" },
-    },
-  });
+export async function scrapeAllSeedAccounts() {
+  const accounts = await getAllSeedAccounts();
+  return scrapeAccounts(accounts);
 }
 
-/**
- * DB - user accounts
- */
-export async function getUserSeedAccounts(userId: string) {
-  return prisma.seedAccount.findMany({
-    where: {
-      userId,
-    },
-  });
+export async function scrapeUserSeedAccounts(userId: string) {
+  const accounts = await getUserSeedAccounts(userId);
+  return scrapeAccounts(accounts);
 }
 
-/**
- * APIFY SCRAPER
- */
 async function scrapeAccounts(
   accounts: { id: string; linkedinUrl: string | null }[]
 ) {
@@ -78,17 +66,4 @@ async function scrapeAccounts(
   );
 
   return { success: true, total: totalPostsScraped };
-}
-
-/**
- * PUBLIC API
- */
-export async function scrapeAllSeedAccounts() {
-  const accounts = await getAllSeedAccounts();
-  return scrapeAccounts(accounts);
-}
-
-export async function scrapeUserSeedAccounts(userId: string) {
-  const accounts = await getUserSeedAccounts(userId);
-  return scrapeAccounts(accounts);
 }

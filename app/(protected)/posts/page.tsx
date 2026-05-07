@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { getPostsByUser } from "@/lib/db/posts";
+import { getAllPostsByUser } from "@/lib/db/posts";
 import { PostCard } from "./_components/post-card";
 
 export default async function WatchFeedPage() {
@@ -7,7 +7,7 @@ export default async function WatchFeedPage() {
 
   if (!session?.user?.id) return null;
   
-  const posts = await getPostsByUser(session.user.id);
+  const posts = await getAllPostsByUser(session.user.id);
 
   return (
     <main className="min-h-screen py-8 px-4 font-sans">
