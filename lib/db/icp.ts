@@ -11,6 +11,15 @@ export async function getIcp(userId: string) {
   });
 }
 
+export async function getKeywordsIcp() {
+  const icps = await prisma.icp.findMany({
+    select: {
+      keywords: true,
+    },
+  });
+
+  return icps.flatMap((icp) => icp.keywords ?? []);
+}
 /**
  * Check if user has an ICP
  */

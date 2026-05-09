@@ -155,6 +155,8 @@ model Lead {
   
   timestamp     BigInt?
   postLink      String? 
+  keywords      Json?
+  status        String @default("PENDING") 
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

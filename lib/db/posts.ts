@@ -115,3 +115,17 @@ export async function getLastPostsPerUser() {
     },
   });
 }
+
+export async function getPostContentById(postId: string) {
+  const post = await prisma.post.findUnique({
+    where: {
+      id: postId,
+    },
+    select: {
+      id: true,
+      content: true,
+    },
+  });
+
+  return post;
+}
